@@ -12,7 +12,7 @@ const railStyle = {
   height: 8,
   borderRadius: 4,
   cursor: 'pointer',
-  backgroundColor: 'rgb(155,155,155)'
+  backgroundColor: '#d8d8d8'
 }
 
 const domain = [100, 500]

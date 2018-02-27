@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 export function Handle({
   domain: [min, max],
   handle: { id, value, percent },
-  getHandleProps,
+  getHandleProps
 }) {
   return (
     <div
@@ -23,14 +23,14 @@ export function Handle({
         marginLeft: '-11px',
         marginTop: '-9px',
         zIndex: 2,
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         cursor: 'pointer',
         borderRadius: '50%',
-        border: 'solid 2px rgb(200,200,200)',
-        backgroundColor: '#ff3d00',
+        backgroundColor: 'white',
+        boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.5)'
       }}
-      {...getHandleProps(id) }
+      {...getHandleProps(id)}
     />
   )
 }
@@ -40,9 +40,9 @@ Handle.propTypes = {
   handle: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
-  getHandleProps: PropTypes.func.isRequired,
+  getHandleProps: PropTypes.func.isRequired
 }
 
 // *******************************************************
@@ -59,9 +59,9 @@ export function Track({ source, target, getTrackProps }) {
         borderRadius: 4,
         cursor: 'pointer',
         left: `${source.percent}%`,
-        width: `${target.percent - source.percent}%`,
+        width: `${target.percent - source.percent}%`
       }}
-      {...getTrackProps() }
+      {...getTrackProps()}
     />
   )
 }
@@ -70,14 +70,14 @@ Track.propTypes = {
   source: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
   target: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
-  getTrackProps: PropTypes.func.isRequired,
+  getTrackProps: PropTypes.func.isRequired
 }
 
 // *******************************************************
@@ -93,7 +93,7 @@ export function Tick({ tick, count, format }) {
           width: 1,
           height: 5,
           backgroundColor: 'rgb(200,200,200)',
-          left: `${tick.percent}%`,
+          left: `${tick.percent}%`
         }}
       />
       <div
@@ -104,7 +104,7 @@ export function Tick({ tick, count, format }) {
           textAlign: 'center',
           marginLeft: `${-(100 / count) / 2}%`,
           width: `${100 / count}%`,
-          left: `${tick.percent}%`,
+          left: `${tick.percent}%`
         }}
       >
         {format(tick.value)}
@@ -117,12 +117,12 @@ Tick.propTypes = {
   tick: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
   count: PropTypes.number.isRequired,
-  format: PropTypes.func.isRequired,
+  format: PropTypes.func.isRequired
 }
 
 Tick.defaultProps = {
-  format: d => d,
+  format: d => d
 }

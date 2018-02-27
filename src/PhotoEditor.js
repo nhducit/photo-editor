@@ -57,6 +57,7 @@ export default class PhotoEditor extends React.Component {
       value: 16 / 9,
       name: '16:9'
     },
+    croppedImage: null,
     currentImage: makeUnsplashSrc(DEFAULT_IMAGES[0].id)
   }
 
@@ -72,16 +73,23 @@ export default class PhotoEditor extends React.Component {
   }
 
   changeCropperImage = src => {
-    this.cropper
-      .reset()
-      .clear()
-      .replace(src)
+    this.cropper.clear().replace(src)
   }
 
   initCropper = () => {
     this.cropper = new Cropper(this.cropperElement, {
+      preview: this.previewElement,
       aspectRatio: 16 / 9,
+      zoomOnTouch: false,
+      zoomOnWheel: false,
+      viewMode: 0,
       crop: function(e) {}
+      //   zoom:  (e)=> {
+      //     console.log(e.type, e.detail.ratio);
+      //     this.setState({
+      //         zoomLevel: e.detail.ratio
+      //     })
+      //   }
     })
   }
 
@@ -122,6 +130,16 @@ export default class PhotoEditor extends React.Component {
     this.cropper.rotate(90)
   }
 
+  getCroppedImage = () => {
+    const croppedImage = this.cropper
+      .getCroppedCanvas()
+      .to('image/jpeg', 1.0)
+    this.setState({
+      croppedImage
+    })
+    debugger
+  }
+
   render() {
     return (
       <Div>
@@ -131,6 +149,14 @@ export default class PhotoEditor extends React.Component {
           onRequestClose={this.closeModal}
           onAfterOpen={this.onAfterOpen}
         > */}
+        <Div
+          onClick={() => {
+            this.getCroppedImage()
+          }}
+        >
+          getCroppedImage
+        </Div>
+        <Img src={this.state.croppedImage} />
         <Div borderRadius="3px" border="1px solid #e1e1e1">
           <Div
             display="flex"
@@ -147,65 +173,105 @@ export default class PhotoEditor extends React.Component {
             <Div onClick={this.closeModal}>X</Div>
           </Div>
           <Div display="flex">
-            <Div width="100px" overFlowY="auto">
+            <Div
+              width="150px"
+              overflowY="auto"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              paddingTop="16px"
+            >
               {DEFAULT_IMAGES.map(imageConfig => {
                 const src = makeUnsplashSrc(imageConfig.id)
                 return (
                   <Img
                     key={src}
-                    height={80}
-                    width={80}
+                    height={100}
+                    width={100}
                     src={src}
                     onClick={() => this.changeImage(src)}
+                    marginBottom="8px"
+                    borderRadius="3px"
                   />
                 )
               })}
             </Div>
             <Div flex="1">
-              <Div position="relative">
-                <Div>
-                  <img
+              <Div display="flex">
+                <Div
+                  flex="1"
+                  position="relative"
+                  display="flex"
+                  justifyContent="center"
+                >
+                  <Img
                     crossOrigin="true"
-                    ref={cropperElement => {
+                    innerRef={cropperElement => {
                       this.cropperElement = cropperElement
                     }}
                     src={this.state.currentImage}
                   />
+                  <Div
+                    position="absolute"
+                    bottom="10px"
+                    background="rgba(0, 0, 0, 0.3)"
+                    borderRadius="3px"
+                    display="inline-flex"
+                    color="white"
+                  >
+                    {[
+                      { value: 16 / 9, name: '16:9' },
+                      { value: 4 / 3, name: '4:3' },
+                      { value: 1, name: '1:1' },
+                      { value: 2 / 3, name: '2:3' },
+                      { value: 2 / 1, name: '2:1' }
+                    ].map((ratio, index) => {
+                      return (
+                        <Div
+                          key={ratio.value}
+                          width="50px"
+                          height="36px"
+                          background={
+                            ratio.value === this.state.aspectRatio.value
+                              ? 'black'
+                              : 'transparent'
+                          }
+                          display="flex"
+                          justifyContent="center"
+                          alignItems="center"
+                          onClick={() => this.onRatioChanged(ratio)}
+                        >
+                          {ratio.name}
+                        </Div>
+                      )
+                    })}
+                  </Div>
                 </Div>
                 <Div
-                  position="absolute"
-                  bottom="10px"
-                  background="rgba(0, 0, 0, 0.3)"
-                  borderRadius="3px"
-                  display="inline-flex"
-                  color="white"
+                  width="200px"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
                 >
-                  {[
-                    { value: 16 / 9, name: '16:9' },
-                    { value: 4 / 3, name: '4:3' },
-                    { value: 1, name: '1:1' },
-                    { value: 2 / 3, name: '2:3' },
-                    { value: 2 / 1, name: '2:1' }
-                  ].map((ratio, index) => {
-                    return (
-                      <Div
-                        width="50px"
-                        height="36px"
-                        key={ratio.value}
-                        background={
-                          ratio.value === this.state.aspectRatio.value
-                            ? 'black'
-                            : 'transparent'
-                        }
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        onClick={() => this.onRatioChanged(ratio)}
-                      >
-                        {ratio.name}
-                      </Div>
-                    )
-                  })}
+                  <Div
+                    width="150px"
+                    fontSize="22px"
+                    fontWeight="600"
+                    marginTop="16px"
+                    color="3e3e3e"
+                    textAlign="left"
+                  >
+                    Preview
+                  </Div>
+                  <Div
+                    marginTop="16px"
+                    width="150px"
+                    height="300px"
+                    overflow="hidden"
+                    innerRef={previewElement => {
+                      this.previewElement = previewElement
+                    }}
+                  />
                 </Div>
               </Div>
               <Div
@@ -232,14 +298,43 @@ export default class PhotoEditor extends React.Component {
                 alignItems="center"
                 justifyContent="space-between"
                 borderTop="1px solid #e1e1e1"
+                padding="24px"
               >
                 <Div display="flex">
                   <Div>Reset</Div>
-                  <Div>Delete</Div>
+                  <Div maginLeft="12px">Delete</Div>
                 </Div>
                 <Div display="flex">
-                  <Div>Change photo</Div>
-                  <Div>Apply Change</Div>
+                  <Div
+                    height="40px"
+                    border="1px solid #33a0e8"
+                    borderRadius="3px"
+                    color="#33a0e8"
+                    fontWeight="600"
+                    fontSize="16px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    padding="0 10px"
+                    marginLeft="12px"
+                  >
+                    Change photo
+                  </Div>
+                  <Div
+                    height="40px"
+                    backgroundColor="#33a0e8"
+                    borderRadius="3px"
+                    color="white"
+                    fontWeight="600"
+                    fontSize="16px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    padding="0 10px"
+                    marginLeft="12px"
+                  >
+                    Apply
+                  </Div>
                 </Div>
               </Div>
             </Div>
